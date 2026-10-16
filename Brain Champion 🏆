@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brain Champion</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #101827;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+.card {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 22px;
+  background: #1d2b43;
+  border-radius: 18px;
+}
+h1 { color: #ffd34e; }
+button {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border: 0;
+  border-radius: 10px;
+  background: #ffd34e;
+  color: #101827;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+#feedback { min-height: 24px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🧠 Brain Champion 🏆</h1>
+  <p>Answer questions. Earn points. Become a champion!</p>
+  <h3 id="progress">Question 1 of 5</h3>
+  <h2 id="question">Ready to play?</h2>
+  <div id="answers"></div>
+  <p id="feedback"></p>
+  <h3 id="score">Score: 0</h3>
+  <button id="start" onclick="startGame()">START GAME 🚀</button>
+  <button id="next" onclick="nextQuestion()" hidden>Next question ➜</button>
+</div>
+
+<script>
+const questions = [
+ {q:"Who is famous for the SIUUU celebration?",
+  a:["Messi","Cristiano Ronaldo","Pelé","Neymar"],c:1},
+ {q:"What is the capital of Tanzania?",
+  a:["Arusha","Dodoma","Mwanza","Nairobi"],c:1},
+ {q:"Which planet is called the Red Planet?",
+  a:["Mars","Venus","Earth","Saturn"],c:0},
+ {q:"How many players start a normal football match per team?",
+  a:["9","10","11","12"],c:2},
+ {q:"What gas do humans need to breathe?",
+  a:["Helium","Oxygen","Carbon dioxide","Hydrogen"],c:1}
+];
+
+let index = 0;
+let points = 0;
+let playing = false;
+let answered = false;
+
+function startGame() {
+  index = 0;
+  points = 0;
+  playing = true;
+  document.getElementById("start").hidden = true;
+  document.getElementById("next").hidden = true;
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = questions[index];
+  document.getElementById("progress").textContent =
+    `Question ${index+1} of ${questions.length}`;
+  document.getElementById("question").textContent = q.q;
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("score").textContent = "Score: " + points;
+  const box = document.getElementById("answers");
+  box.replaceChildren();
+
+  q.a.forEach((answer, i) => {
+    const button = document.createElement("button");
+    button.textContent = answer;
+    button.onclick = () => chooseAnswer(i);
+    box.appendChild(button);
+  });
+}
+
+function chooseAnswer(choice) {
+  if (answered || !playing) return;
+  answered = true;
+  const q = questions[index];
+  const buttons = document.querySelectorAll("#answers button");
+
+  if (choice === q.c) {
+    points += 10;
+    document.getElementById("feedback").textContent =
+      "✅ Correct! +10 points!";
+  } else {
+    document.getElementById("feedback").textContent =
+      "❌ Not quite! The correct answer is " + q.a[q.c] + ".";
+  }
+
+  buttons.forEach(button => button.disabled = true);
+  document.getElementById("score").textContent = "Score: " + points;
+  document.getElementById("next").hidden = false;
+  document.getElementById("next").textContent =
+    index === questions.length-1 ? "See results 🏆" : "Next question ➜";
+}
+
+function nextQuestion() {
+  if (!answered) return;
+
+  if (index < questions.length-1) {
+    index++;
+    document.getElementById("next").hidden = true;
+    showQuestion();
+  } else {
+    playing = false;
+    document.getElementById("question").textContent =
+      "🏆 Quiz complete!";
+    document.getElementById("progress").textContent = "FINAL RESULTS";
+    document.getElementById("answers").replaceChildren();
+    document.getElementById("feedback").textContent =
+      "You earned " + points + " out of " +
+      (questions.length * 10) + " points!";
+    document.getElementById("next").hidden = true;
+    document.getElementById("start").textContent = "PLAY AGAIN 🔁";
+    document.getElementById("start").hidden = false;
+  }
+}
+</script>
+</body>
+</html>
